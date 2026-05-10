@@ -1,0 +1,41 @@
+{
+  "admins": [
+    {
+      "id": "admin_001",
+      "username": "superadmin",
+      "email": "admin@grafonia.com",
+      "passwordHash": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.",
+      "role": "superadmin",
+      "name": "Super Admin",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "active": true
+    }
+  ],
+  "orders": [],
+  "settings": {
+    "siteName": "Grafonia",
+    "tagline": "Design & Print in Perfect Harmony",
+    "phone": "+8801317893466",
+    "email": "info@grafonia.com",
+    "address": "Dhaka, Bangladesh",
+    "whatsapp": "8801317893466",
+    "businessHours": "Mon–Sat: 9am – 10pm",
+    "stats": {
+      "clients": 1200,
+      "projects": 5000,
+      "years": 8,
+      "rating": 4.9
+    },
+    "services": [
+      { "id": "visiting-card", "name": "Visiting Card", "basePrice": 500, "active": true },
+      { "id": "banner-print", "name": "Banner Print", "basePrice": 800, "active": true },
+      { "id": "id-card", "name": "ID Card", "basePrice": 300, "active": true },
+      { "id": "brochure", "name": "Brochure & Leaflet", "basePrice": 1200, "active": true },
+      { "id": "sticker", "name": "Sticker & Label", "basePrice": 400, "active": true },
+      { "id": "large-format", "name": "Large Format", "basePrice": 2000, "active": true },
+      { "id": "pvc-card", "name": "PVC Card", "basePrice": 600, "active": true },
+      { "id": "file-envelope", "name": "File & Envelope", "basePrice": 900, "active": true }
+    ]
+  },
+  "messages": []
+}

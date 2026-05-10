@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Grafonia Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --teal: #367289;
+  --teal-dark: #244f63;
+  --teal-light: #4a9ab5;
+  --teal-glow: rgba(54,114,137,0.1);
+  --teal-border: rgba(54,114,137,0.2);
+  --bg: #f0f5f8;
+  --bg2: #e8eef3;
+  --white: #ffffff;
+  --sidebar: #0d1b24;
+  --sidebar2: #1a2e3d;
+  --text: #0d1b24;
+  --text2: #3d5464;
+  --text3: #7a99aa;
+  --border: #dde8ee;
+  --radius: 12px;
+  --shadow: 0 4px 24px rgba(54,114,137,0.1);
+  --shadow-lg: 0 12px 40px rgba(54,114,137,0.15);
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+  --pending: #f59e0b;
+  --confirmed: #3b82f6;
+  --in-progress: #8b5cf6;
+  --completed: #22c55e;
+  --cancelled: #ef4444;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden;}
+
+/* ── Sidebar */
+.sidebar{width:250px;background:var(--sidebar);min-height:100vh;display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:.3s;}
+.sidebar-logo{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sidebar-logo-inner{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--teal),var(--teal-light));border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-icon svg{width:18px;height:18px;fill:white;}
+.logo-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:white;}
+.logo-badge{font-size:9px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.4);text-transform:uppercase;margin-left:auto;background:rgba(255,255,255,.08);padding:3px 7px;border-radius:99px;}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto;}
+.nav-section{margin-bottom:24px;}
+.nav-section-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:0 8px;margin-bottom:8px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;color:rgba(255,255,255,.6);font-size:13.5px;font-weight:500;cursor:pointer;transition:.2s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;}
+.nav-item:hover{background:rgba(255,255,255,.07);color:white;}
+.nav-item.active{background:var(--teal);color:white;}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;}
+.nav-item .badge{margin-left:auto;background:var(--error);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;min-width:20px;text-align:center;}
+.sidebar-footer{padding:16px 12px;border-top:1px solid rgba(255,255,255,.08);}
+.admin-info{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;background:rgba(255,255,255,.06);}
+.admin-avatar{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--teal),var(--teal-light));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0;}
+.admin-name{font-size:13px;font-weight:600;color:white;line-height:1.2;}
+.admin-role{font-size:11px;color:rgba(255,255,255,.4);text-transform:capitalize;}
+.logout-btn{display:flex;align-items:center;gap:8px;padding:9px 12px;margin-top:8px;border-radius:9px;color:rgba(255,255,255,.5);font-size:13px;cursor:pointer;border:none;background:none;width:100%;transition:.2s;}
+.logout-btn:hover{color:var(--error);background:rgba(239,68,68,.1);}
+
+/* ── Main */
+.main{margin-left:250px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;}
+.topbar-actions{display:flex;align-items:center;gap:12px;}
+.topbar-search{position:relative;}
+.topbar-search input{padding:8px 14px 8px 36px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;color:var(--text);background:var(--bg);outline:none;width:220px;transition:.2s;}
+.topbar-search input:focus{border-color:var(--teal);background:white;}
+.topbar-search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--text3);fill:none;}
+.notif-btn{width:38px;height:38px;border-radius:9px;border:1.5px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);position:relative;transition:.2s;}
+.notif-btn:hover{border-color:var(--teal);color:var(--teal);}
+.notif-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--error);border:1.5px solid white;}
+.content{padding:28px;flex:1;}
+
+/* ── Sections */
+.section{display:none;}
+.section.active{display:block;}
+
+/* ── Stats cards */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;transition:.2s;}
+.stat-card:hover{box-shadow:var(--shadow);}
+.stat-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.stat-icon svg{width:18px;height:18px;}
+.stat-change{font-size:11px;font-weight:600;padding:3px 8px;border-radius:99px;}
+.stat-change.up{color:#16a34a;background:#dcfce7;}
+.stat-change.neutral{color:var(--text3);background:var(--bg2);}
+.stat-num{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--text);line-height:1;}
+.stat-label{font-size:12px;color:var(--text3);margin-top:4px;font-weight:500;}
+
+/* ── Tables */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);}
+.card-title{font-size:15px;font-weight:700;color:var(--text);}
+.card-actions{display:flex;gap:8px;align-items:center;}
+.filter-select{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text2);background:none;cursor:pointer;outline:none;}
+.filter-select:focus{border-color:var(--teal);}
+table{width:100%;border-collapse:collapse;}
+th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:12px 20px;text-align:left;background:var(--bg);border-bottom:1px solid var(--border);}
+td{font-size:13.5px;padding:13px 20px;color:var(--text);border-bottom:1px solid var(--border);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--teal-glow);}
+.status-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;text-transform:capitalize;}
+.status-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;}
+.status-pending{color:var(--pending);background:#fef3c7;}
+.status-confirmed{color:var(--confirmed);background:#dbeafe;}
+.status-in-progress{color:var(--in-progress);background:#ede9fe;}
+.status-completed{color:var(--completed);background:#dcfce7;}
+.status-cancelled{color:var(--cancelled);background:#fee2e2;}
+.action-btn{background:none;border:1.5px solid var(--border);border-radius:7px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:.2s;color:var(--text2);}
+.action-btn:hover{border-color:var(--teal);color:var(--teal);}
+.action-btn.danger:hover{border-color:var(--error);color:var(--error);}
+.action-btn.success:hover{border-color:var(--success);color:var(--success);}
+
+/* ── Buttons */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:9px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;border:none;transition:.2s;}
+.btn-primary{background:var(--teal);color:white;}
+.btn-primary:hover{background:var(--teal-dark);box-shadow:0 4px 12px rgba(54,114,137,.3);}
+.btn-ghost{background:none;border:1.5px solid var(--border);color:var(--text2);}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal);}
+.btn-danger{background:var(--error);color:white;}
+.btn-danger:hover{background:#dc2626;}
+.btn-sm{padding:7px 13px;font-size:12px;}
+
+/* ── Forms */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-group{margin-bottom:18px;}
+.form-group.full{grid-column:1/-1;}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none;transition:.2s;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-glow);}
+.form-group textarea{resize:vertical;min-height:80px;}
+
+/* ── Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:18px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid var(--border);}
+.modal-title{font-size:16px;font-weight:700;}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);line-height:1;padding:4px;}
+.modal-close:hover{color:var(--text);}
+.modal-body{padding:24px;}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--border);}
+
+/* ── Alerts */
+.alert{padding:14px 18px;border-radius:10px;font-size:13px;font-weight:500;margin-bottom:18px;display:none;}
+.alert.show{display:block;}
+.alert-success{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0;}
+.alert-error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;}
+
+/* ── Toggle */
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:99px;cursor:pointer;transition:.2s;}
+.toggle-slider::before{content:'';position:absolute;width:16px;height:16px;background:white;border-radius:50%;top:3px;left:3px;transition:.2s;}
+.toggle input:checked + .toggle-slider{background:var(--teal);}
+.toggle input:checked + .toggle-slider::before{transform:translateX(18px);}
+
+/* ── Empty state */
+.empty{text-align:center;padding:60px 20px;}
+.empty-icon{font-size:48px;margin-bottom:14px;opacity:.3;}
+.empty-text{font-size:14px;color:var(--text3);}
+
+/* ── Responsive */
+.pagination{display:flex;align-items:center;gap:8px;padding:16px 20px;border-top:1px solid var(--border);justify-content:center;}
+.page-btn{width:32px;height:32px;border:1.5px solid var(--border);border-radius:7px;background:none;cursor:pointer;font-size:13px;font-weight:500;transition:.2s;}
+.page-btn:hover,.page-btn.active{background:var(--teal);color:white;border-color:var(--teal);}
+.page-info{font-size:13px;color:var(--text3);padding:0 10px;}
+
+/* ── Settings */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.settings-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
+.settings-card h3{font-size:15px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.settings-card h3 svg{width:16px;height:16px;stroke:var(--teal);fill:none;}
+
+/* ── Services table in settings */
+.service-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.service-row:last-child{border-bottom:none;}
+.service-name{flex:1;font-size:13px;font-weight:500;}
+.service-price{font-size:13px;font-weight:700;color:var(--teal);width:90px;}
+.service-price input{width:90px;padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-weight:600;color:var(--teal);}
+
+/* Spinner */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;gap:12px;color:var(--text3);font-size:14px;}
+.loading .spinner{border-color:var(--teal-border);border-top-color:var(--teal);}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-inner">
+      <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <div class="logo-text">Grafonia</div>
+      <span class="logo-badge">Admin</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Overview</div>
+      <button class="nav-item active" onclick="showSection('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Operations</div>
+      <button class="nav-item" onclick="showSection('orders')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Orders
+        <span class="badge" id="pendingBadge" style="display:none">0</span>
+      </button>
+      <button class="nav-item" onclick="showSection('messages')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Messages
+        <span class="badge" id="msgBadge" style="display:none">0</span>
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Administration</div>
+      <button class="nav-item" onclick="showSection('admins')" id="adminsNavItem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Admins
+      </button>
+      <button class="nav-item" onclick="showSection('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </button>
+      <button class="nav-item" onclick="showSection('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        My Profile
+      </button>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="admin-info">
+      <div class="admin-avatar" id="sidebarAvatar">A</div>
+      <div>
+        <div class="admin-name" id="sidebarName">Admin</div>
+        <div class="admin-role" id="sidebarRole">admin</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    <div class="topbar-actions">
+      <div class="topbar-search">
+        <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search orders…" id="globalSearch" oninput="handleGlobalSearch(this.value)"/>
+      </div>
+      <button class="notif-btn" onclick="showSection('messages')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="notif-dot" id="notifDot" style="display:none"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ==================== DASHBOARD ==================== -->
+    <div class="section active" id="sec-dashboard">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon" style="background:#dbeafe;color:#3b82f6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg></div>
+          </div>
+          <div class="stat-num" id="ds-total">—</div>
+          <div class="stat-label">Total Orders</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon" style="background:#fef3c7;color:#f59e0b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          </div>
+          <div class="stat-num" id="ds-pending">—</div>
+          <div class="stat-label">Pending Orders</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon" style="background:#dcfce7;color:#22c55e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </div>
+          <div class="stat-num" id="ds-completed">—</div>
+          <div class="stat-label">Completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon" style="background:#ede9fe;color:#8b5cf6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+          </div>
+          <div class="stat-num" id="ds-messages">—</div>
+          <div class="stat-label">Messages</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Recent Orders</div>
+          <button class="btn btn-ghost btn-sm" onclick="showSection('orders')">View all →</button>
+        </div>
+        <div id="recentOrdersTable"><div class="loading"><span class="spinner"></span> Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- ==================== ORDERS ==================== -->
+    <div class="section" id="sec-orders">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">All Orders</div>
+          <div class="card-actions">
+            <select class="filter-select" id="orderStatusFilter" onchange="loadOrders()">
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div id="ordersTableWrap"><div class="loading"><span class="spinner"></span> Loading…</div></div>
+        <div class="pagination" id="ordersPagination" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ==================== MESSAGES ==================== -->
+    <div class="section" id="sec-messages">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Customer Messages</div>
+        </div>
+        <div id="messagesTableWrap"><div class="loading"><span class="spinner"></span> Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- ==================== ADMINS ==================== -->
+    <div class="section" id="sec-admins">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Admin Accounts</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddAdmin()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Admin
+          </button>
+        </div>
+        <div id="adminsTableWrap"><div class="loading"><span class="spinner"></span> Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- ==================== SETTINGS ==================== -->
+    <div class="section" id="sec-settings">
+      <div class="alert alert-success" id="settingsSuccess">Settings saved successfully!</div>
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h3>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+            Site Info
+          </h3>
+          <div class="form-group"><label>Site Name</label><input type="text" id="s-siteName"/></div>
+          <div class="form-group"><label>Tagline</label><input type="text" id="s-tagline"/></div>
+          <div class="form-group"><label>Business Hours</label><input type="text" id="s-hours"/></div>
+          <button class="btn btn-primary" onclick="saveGeneralSettings()">Save Changes</button>
+        </div>
+
+        <div class="settings-card">
+          <h3>
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2A19.79 19.79 0 0112 18.85a19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            Contact Details
+          </h3>
+          <div class="form-group"><label>Phone</label><input type="text" id="s-phone"/></div>
+          <div class="form-group"><label>Email</label><input type="email" id="s-email"/></div>
+          <div class="form-group"><label>WhatsApp (number only)</label><input type="text" id="s-whatsapp"/></div>
+          <div class="form-group"><label>Address</label><input type="text" id="s-address"/></div>
+          <button class="btn btn-primary" onclick="saveContactSettings()">Save Changes</button>
+        </div>
+
+        <div class="settings-card">
+          <h3>
+            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Stats (Hero Section)
+          </h3>
+          <div class="form-grid">
+            <div class="form-group"><label>Clients</label><input type="number" id="s-clients"/></div>
+            <div class="form-group"><label>Projects</label><input type="number" id="s-projects"/></div>
+            <div class="form-group"><label>Years</label><input type="number" id="s-years"/></div>
+            <div class="form-group"><label>Rating</label><input type="number" step="0.1" id="s-rating"/></div>
+          </div>
+          <button class="btn btn-primary" onclick="saveStatsSettings()">Save Changes</button>
+        </div>
+
+        <div class="settings-card">
+          <h3>
+            <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Services & Pricing
+          </h3>
+          <div id="servicesSettingsList"></div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="openAddService()">+ Add Service</button>
+          <button class="btn btn-primary" style="margin-top:12px;margin-left:8px" onclick="saveServicesPricing()">Save Prices</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PROFILE ==================== -->
+    <div class="section" id="sec-profile">
+      <div style="max-width:480px">
+        <div class="settings-card">
+          <h3>My Account</h3>
+          <div class="alert alert-success" id="profileSuccess">Password changed successfully!</div>
+          <div class="alert alert-error" id="profileError"></div>
+          <div class="form-group"><label>Name</label><input type="text" id="p-name" disabled style="background:var(--bg)"/></div>
+          <div class="form-group"><label>Username</label><input type="text" id="p-username" disabled style="background:var(--bg)"/></div>
+          <div class="form-group"><label>Email</label><input type="text" id="p-email" disabled style="background:var(--bg)"/></div>
+          <div class="form-group"><label>Role</label><input type="text" id="p-role" disabled style="background:var(--bg)"/></div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:20px 0"/>
+          <h3 style="font-size:14px;margin-bottom:16px">Change Password</h3>
+          <div class="form-group"><label>Current Password</label><input type="password" id="p-currPass"/></div>
+          <div class="form-group"><label>New Password (min 6 chars)</label><input type="password" id="p-newPass"/></div>
+          <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Order Detail Modal -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="orderModalTitle">Order Details</div>
+      <button class="modal-close" onclick="closeModal('orderModal')">×</button>
+    </div>
+    <div class="modal-body" id="orderModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('orderModal')">Close</button>
+      <button class="btn btn-primary" onclick="saveOrderUpdate()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Admin Modal -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="adminModalTitle">Add Admin</div>
+      <button class="modal-close" onclick="closeModal('adminModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-error" id="adminModalError"></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Full Name *</label><input type="text" id="am-name"/></div>
+        <div class="form-group"><label>Username *</label><input type="text" id="am-username"/></div>
+        <div class="form-group"><label>Email *</label><input type="email" id="am-email"/></div>
+        <div class="form-group"><label>Role</label>
+          <select id="am-role"><option value="admin">Admin</option><option value="superadmin">Superadmin</option></select>
+        </div>
+        <div class="form-group full"><label>Password *</label><input type="password" id="am-password" placeholder="Min 6 characters"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('adminModal')">Cancel</button>
+      <button class="btn btn-primary" id="adminModalSaveBtn" onclick="saveAdmin()">Create Admin</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Service Modal -->
+<div class="modal-overlay" id="serviceModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add New Service</div>
+      <button class="modal-close" onclick="closeModal('serviceModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Service Name *</label><input type="text" id="svc-name"/></div>
+      <div class="form-group"><label>Base Price (৳) *</label><input type="number" id="svc-price"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('serviceModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addService()">Add Service</button>
+    </div>
+  </div>
+</div>
+
+<!-- Message Detail Modal -->
+<div class="modal-overlay" id="msgModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Message</div>
+      <button class="modal-close" onclick="closeModal('msgModal')">×</button>
+    </div>
+    <div class="modal-body" id="msgModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="msgDeleteBtn">Delete</button>
+      <button class="btn btn-ghost" onclick="closeModal('msgModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// GLOBALS
+// ============================================================
+const API = '/api';
+let token = localStorage.getItem('grafonia_token');
+let adminInfo = JSON.parse(localStorage.getItem('grafonia_admin') || '{}');
+let currentOrderId = null;
+let editingAdminId = null;
+let ordersPage = 1;
+let ordersTotal = 0;
+
+// ── Auth guard
+if (!token) window.location.href = '/admin/index.html';
+
+// ── Init sidebar with admin info
+document.getElementById('sidebarName').textContent = adminInfo.name || 'Admin';
+document.getElementById('sidebarRole').textContent = adminInfo.role || 'admin';
+document.getElementById('sidebarAvatar').textContent = (adminInfo.name || 'A')[0].toUpperCase();
+
+// Hide admins menu if not superadmin
+if (adminInfo.role !== 'superadmin') {
+  document.getElementById('adminsNavItem').style.display = 'none';
+}
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+}
+
+async function apiFetch(url, opts = {}) {
+  const res = await fetch(API + url, {
+    headers: authHeaders(),
+    ...opts
+  });
+  if (res.status === 401) { logout(); return null; }
+  return res;
+}
+
+function logout() {
+  localStorage.removeItem('grafonia_token');
+  localStorage.removeItem('grafonia_admin');
+  window.location.href = '/admin/index.html';
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+const sectionTitles = {
+  dashboard: 'Dashboard', orders: 'Orders', messages: 'Messages',
+  admins: 'Admin Accounts', settings: 'Settings', profile: 'My Profile'
+};
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b => {
+    if (b.getAttribute('onclick')?.includes(`'${id}'`)) b.classList.add('active');
+  });
+  document.getElementById('topbarTitle').textContent = sectionTitles[id] || '';
+
+  if (id === 'dashboard') loadDashboard();
+  if (id === 'orders') loadOrders();
+  if (id === 'messages') loadMessages();
+  if (id === 'admins') loadAdmins();
+  if (id === 'settings') loadSettings();
+  if (id === 'profile') loadProfile();
+}
+
+function handleGlobalSearch(val) {
+  showSection('orders');
+  setTimeout(() => { loadOrders(val); }, 100);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+async function loadDashboard() {
+  const [statsRes, ordersRes, msgsRes] = await Promise.all([
+    apiFetch('/stats/orders'),
+    apiFetch('/orders?limit=5&page=1'),
+    apiFetch('/messages')
+  ]);
+
+  if (!statsRes) return;
+  const stats = await statsRes.json();
+  const ordersData = await ordersRes.json();
+  const msgs = await msgsRes.json();
+  const unread = msgs.filter(m => !m.read).length;
+
+  document.getElementById('ds-total').textContent = stats.total;
+  document.getElementById('ds-pending').textContent = stats.pending;
+  document.getElementById('ds-completed').textContent = stats.completed;
+  document.getElementById('ds-messages').textContent = msgs.length;
+
+  // Badges
+  if (stats.pending > 0) {
+    document.getElementById('pendingBadge').style.display = '';
+    document.getElementById('pendingBadge').textContent = stats.pending;
+  }
+  if (unread > 0) {
+    document.getElementById('msgBadge').style.display = '';
+    document.getElementById('msgBadge').textContent = unread;
+    document.getElementById('notifDot').style.display = '';
+  }
+
+  renderOrdersTable(ordersData.orders, 'recentOrdersTable', true);
+}
+
+// ============================================================
+// ORDERS
+// ============================================================
+async function loadOrders(search = '') {
+  const status = document.getElementById('orderStatusFilter')?.value || 'all';
+  const searchVal = search || document.getElementById('globalSearch')?.value || '';
+  let url = `/orders?page=${ordersPage}&limit=15&status=${status}`;
+  if (searchVal) url += `&search=${encodeURIComponent(searchVal)}`;
+
+  const res = await apiFetch(url);
+  if (!res) return;
+  const data = await res.json();
+  ordersTotal = data.total;
+
+  renderOrdersTable(data.orders, 'ordersTableWrap', false);
+  renderPagination(data.total, data.page, data.limit);
+}
+
+function renderOrdersTable(orders, containerId, compact) {
+  const wrap = document.getElementById(containerId);
+  if (!orders || !orders.length) {
+    wrap.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No orders found</div></div>';
+    return;
+  }
+
+  const rows = orders.map(o => `
+    <tr>
+      <td><strong>${o.id}</strong></td>
+      <td>${o.name}</td>
+      <td>${o.phone}</td>
+      <td>${o.service}</td>
+      ${!compact ? `<td>${o.quantity}</td>` : ''}
+      <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+      <td>${new Date(o.createdAt).toLocaleDateString('en-BD')}</td>
+      <td>
+        <button class="action-btn" onclick="openOrderModal('${o.id}')">Edit</button>
+        ${!compact ? `<button class="action-btn danger" onclick="deleteOrder('${o.id}')">Delete</button>` : ''}
+      </td>
+    </tr>
+  `).join('');
+
+  wrap.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Order ID</th><th>Customer</th><th>Phone</th><th>Service</th>
+        ${!compact ? '<th>Qty</th>' : ''}
+        <th>Status</th><th>Date</th><th>Actions</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function renderPagination(total, page, limit) {
+  const pag = document.getElementById('ordersPagination');
+  const pages = Math.ceil(total / limit);
+  if (pages <= 1) { pag.style.display = 'none'; return; }
+  pag.style.display = 'flex';
+
+  let html = `<span class="page-info">${total} orders</span>`;
+  for (let i = 1; i <= pages; i++) {
+    html += `<button class="page-btn${i === page ? ' active' : ''}" onclick="changePage(${i})">${i}</button>`;
+  }
+  pag.innerHTML = html;
+}
+
+function changePage(p) {
+  ordersPage = p;
+  loadOrders();
+}
+
+async function openOrderModal(id) {
+  currentOrderId = id;
+  const res = await apiFetch(`/orders/${id}`);
+  if (!res) return;
+  const o = await res.json();
+
+  document.getElementById('orderModalTitle').textContent = `Order — ${o.id}`;
+  document.getElementById('orderModalBody').innerHTML = `
+    <div style="margin-bottom:16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div><strong style="font-size:11px;color:var(--text3);text-transform:uppercase">Customer</strong><p style="margin-top:4px">${o.name}</p></div>
+        <div><strong style="font-size:11px;color:var(--text3);text-transform:uppercase">Phone</strong><p style="margin-top:4px">${o.phone}</p></div>
+        <div><strong style="font-size:11px;color:var(--text3);text-transform:uppercase">Email</strong><p style="margin-top:4px">${o.email || '—'}</p></div>
+        <div><strong style="font-size:11px;color:var(--text3);text-transform:uppercase">Service</strong><p style="margin-top:4px">${o.service}</p></div>
+        <div><strong style="font-size:11px;color:var(--text3);text-transform:uppercase">Quantity</strong><p style="margin-top:4px">${o.quantity}</p></div>
+        <div><strong style="font-size:11px;color:var(--text3);text-transform:uppercase">Date</strong><p style="margin-top:4px">${new Date(o.createdAt).toLocaleString()}</p></div>
+      </div>
+      ${o.details ? `<div style="margin-bottom:16px"><strong style="font-size:11px;color:var(--text3);text-transform:uppercase">Details</strong><p style="margin-top:4px;font-size:13px;color:var(--text2)">${o.details}</p></div>` : ''}
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="om-status">
+        <option value="pending"${o.status==='pending'?' selected':''}>Pending</option>
+        <option value="confirmed"${o.status==='confirmed'?' selected':''}>Confirmed</option>
+        <option value="in-progress"${o.status==='in-progress'?' selected':''}>In Progress</option>
+        <option value="completed"${o.status==='completed'?' selected':''}>Completed</option>
+        <option value="cancelled"${o.status==='cancelled'?' selected':''}>Cancelled</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Admin Notes</label>
+      <textarea id="om-notes" rows="3">${o.notes || ''}</textarea>
+    </div>
+  `;
+  openModal('orderModal');
+}
+
+async function saveOrderUpdate() {
+  if (!currentOrderId) return;
+  const status = document.getElementById('om-status').value;
+  const notes = document.getElementById('om-notes').value;
+
+  const res = await apiFetch(`/orders/${currentOrderId}`, {
+    method: 'PUT',
+    body: JSON.stringify({ status, notes })
+  });
+  if (res && res.ok) {
+    closeModal('orderModal');
+    loadOrders();
+    loadDashboard();
+  }
+}
+
+async function deleteOrder(id) {
+  if (!confirm(`Delete order ${id}? This cannot be undone.`)) return;
+  const res = await apiFetch(`/orders/${id}`, { method: 'DELETE' });
+  if (res && res.ok) loadOrders();
+}
+
+// ============================================================
+// MESSAGES
+// ============================================================
+async function loadMessages() {
+  const res = await apiFetch('/messages');
+  if (!res) return;
+  const msgs = await res.json();
+  const wrap = document.getElementById('messagesTableWrap');
+
+  if (!msgs.length) {
+    wrap.innerHTML = '<div class="empty"><div class="empty-icon">💬</div><div class="empty-text">No messages yet</div></div>';
+    return;
+  }
+
+  const rows = msgs.map(m => `
+    <tr style="${!m.read ? 'font-weight:600' : ''}">
+      <td>${m.id}</td>
+      <td>${m.name}</td>
+      <td>${m.email || '—'}</td>
+      <td>${m.phone || '—'}</td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.message}</td>
+      <td>${new Date(m.createdAt).toLocaleDateString()}</td>
+      <td><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:${m.read?'var(--bg2)':'#dbeafe'};color:${m.read?'var(--text3)':'#1d4ed8'}">${m.read ? 'Read' : 'New'}</span></td>
+      <td>
+        <button class="action-btn" onclick="openMsgModal(${JSON.stringify(m).replace(/"/g,'&quot;')})">View</button>
+        <button class="action-btn danger" onclick="deleteMsg('${m.id}')">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+
+  wrap.innerHTML = `<table>
+    <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Message</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function openMsgModal(m) {
+  document.getElementById('msgModalBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div><strong style="font-size:11px;color:var(--text3);text-transform:uppercase">From</strong><p style="margin-top:4px">${m.name}</p></div>
+      <div><strong style="font-size:11px;color:var(--text3);text-transform:uppercase">Date</strong><p style="margin-top:4px">${new Date(m.createdAt).toLocaleString()}</p></div>
+      ${m.email ? `<div><strong style="font-size:11px;color:var(--text3);text-transform:uppercase">Email</strong><p style="margin-top:4px">${m.email}</p></div>` : ''}
+      ${m.phone ? `<div><strong style="font-size:11px;color:var(--text3);text-transform:uppercase">Phone</strong><p style="margin-top:4px">${m.phone}</p></div>` : ''}
+    </div>
+    <div style="background:var(--bg);border-radius:10px;padding:16px;font-size:14px;line-height:1.7;color:var(--text2)">${m.message}</div>
+  `;
+  document.getElementById('msgDeleteBtn').onclick = () => { deleteMsg(m.id); closeModal('msgModal'); };
+  openModal('msgModal');
+  if (!m.read) markMsgRead(m.id);
+}
+
+async function markMsgRead(id) {
+  await apiFetch(`/messages/${id}/read`, { method: 'PUT', body: JSON.stringify({}) });
+  loadMessages();
+}
+
+async function deleteMsg(id) {
+  if (!confirm('Delete this message?')) return;
+  const res = await apiFetch(`/messages/${id}`, { method: 'DELETE' });
+  if (res && res.ok) loadMessages();
+}
+
+// ============================================================
+// ADMINS
+// ============================================================
+async function loadAdmins() {
+  const res = await apiFetch('/admins');
+  if (!res) return;
+  const admins = await res.json();
+  const wrap = document.getElementById('adminsTableWrap');
+
+  const rows = admins.map(a => `
+    <tr>
+      <td><strong>${a.name}</strong></td>
+      <td>${a.username}</td>
+      <td>${a.email}</td>
+      <td><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:${a.role==='superadmin'?'#ede9fe':'var(--bg2)'};color:${a.role==='superadmin'?'#7c3aed':'var(--text2)'}">${a.role}</span></td>
+      <td><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:${a.active?'#dcfce7':'#fee2e2'};color:${a.active?'#15803d':'#991b1b'}">${a.active?'Active':'Inactive'}</span></td>
+      <td>${new Date(a.createdAt).toLocaleDateString()}</td>
+      <td>
+        <button class="action-btn" onclick="toggleAdminActive('${a.id}', ${!a.active})">${a.active ? 'Disable' : 'Enable'}</button>
+        ${a.id !== adminInfo.id ? `<button class="action-btn danger" onclick="deleteAdmin('${a.id}')">Delete</button>` : '<span style="font-size:11px;color:var(--text3)">You</span>'}
+      </td>
+    </tr>
+  `).join('');
+
+  wrap.innerHTML = `<table>
+    <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function openAddAdmin() {
+  editingAdminId = null;
+  document.getElementById('adminModalTitle').textContent = 'Add Admin';
+  document.getElementById('adminModalSaveBtn').textContent = 'Create Admin';
+  ['am-name','am-username','am-email','am-password'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('am-role').value = 'admin';
+  document.getElementById('adminModalError').classList.remove('show');
+  openModal('adminModal');
+}
+
+async function saveAdmin() {
+  const name = document.getElementById('am-name').value.trim();
+  const username = document.getElementById('am-username').value.trim();
+  const email = document.getElementById('am-email').value.trim();
+  const password = document.getElementById('am-password').value;
+  const role = document.getElementById('am-role').value;
+  const errEl = document.getElementById('adminModalError');
+
+  if (!name || !username || !email || !password) {
+    errEl.textContent = 'All fields are required.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const res = await apiFetch('/admins', {
+    method: 'POST',
+    body: JSON.stringify({ name, username, email, password, role })
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    errEl.textContent = data.error || 'Failed to create admin';
+    errEl.classList.add('show');
+    return;
+  }
+  closeModal('adminModal');
+  loadAdmins();
+}
+
+async function toggleAdminActive(id, active) {
+  await apiFetch(`/admins/${id}`, { method: 'PUT', body: JSON.stringify({ active }) });
+  loadAdmins();
+}
+
+async function deleteAdmin(id) {
+  if (!confirm('Delete this admin account? This cannot be undone.')) return;
+  const res = await apiFetch(`/admins/${id}`, { method: 'DELETE' });
+  if (res && res.ok) loadAdmins();
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+async function loadSettings() {
+  const res = await fetch(`${API}/settings`);
+  const s = await res.json();
+
+  document.getElementById('s-siteName').value = s.siteName || '';
+  document.getElementById('s-tagline').value = s.tagline || '';
+  document.getElementById('s-hours').value = s.businessHours || '';
+  document.getElementById('s-phone').value = s.phone || '';
+  document.getElementById('s-email').value = s.email || '';
+  document.getElementById('s-whatsapp').value = s.whatsapp || '';
+  document.getElementById('s-address').value = s.address || '';
+  document.getElementById('s-clients').value = s.stats?.clients || '';
+  document.getElementById('s-projects').value = s.stats?.projects || '';
+  document.getElementById('s-years').value = s.stats?.years || '';
+  document.getElementById('s-rating').value = s.stats?.rating || '';
+
+  renderServicesSettings(s.services || []);
+}
+
+function renderServicesSettings(services) {
+  const list = document.getElementById('servicesSettingsList');
+  list.innerHTML = services.map(s => `
+    <div class="service-row" data-id="${s.id}">
+      <div class="service-name">${s.name}</div>
+      <input type="number" class="service-price" value="${s.basePrice}" placeholder="Price" data-id="${s.id}"/>
+      <label class="toggle" title="Active">
+        <input type="checkbox" ${s.active ? 'checked' : ''} data-id="${s.id}" onchange="toggleService('${s.id}', this.checked)"/>
+        <span class="toggle-slider"></span>
+      </label>
+      <button class="action-btn danger btn-sm" onclick="deleteService('${s.id}')">×</button>
+    </div>
+  `).join('');
+}
+
+async function saveGeneralSettings() {
+  const body = {
+    siteName: document.getElementById('s-siteName').value,
+    tagline: document.getElementById('s-tagline').value,
+    businessHours: document.getElementById('s-hours').value
+  };
+  const res = await apiFetch('/settings', { method: 'PUT', body: JSON.stringify(body) });
+  if (res && res.ok) flashAlert('settingsSuccess');
+}
+
+async function saveContactSettings() {
+  const body = {
+    phone: document.getElementById('s-phone').value,
+    email: document.getElementById('s-email').value,
+    whatsapp: document.getElementById('s-whatsapp').value,
+    address: document.getElementById('s-address').value
+  };
+  const res = await apiFetch('/settings', { method: 'PUT', body: JSON.stringify(body) });
+  if (res && res.ok) flashAlert('settingsSuccess');
+}
+
+async function saveStatsSettings() {
+  const stats = {
+    clients: parseInt(document.getElementById('s-clients').value),
+    projects: parseInt(document.getElementById('s-projects').value),
+    years: parseInt(document.getElementById('s-years').value),
+    rating: parseFloat(document.getElementById('s-rating').value)
+  };
+  const res = await apiFetch('/settings', { method: 'PUT', body: JSON.stringify({ stats }) });
+  if (res && res.ok) flashAlert('settingsSuccess');
+}
+
+async function saveServicesPricing() {
+  const inputs = document.querySelectorAll('.service-price[data-id]');
+  for (const inp of inputs) {
+    const id = inp.getAttribute('data-id');
+    await apiFetch(`/settings/services/${id}`, {
+      method: 'PUT', body: JSON.stringify({ basePrice: parseInt(inp.value) })
+    });
+  }
+  flashAlert('settingsSuccess');
+}
+
+async function toggleService(id, active) {
+  await apiFetch(`/settings/services/${id}`, { method: 'PUT', body: JSON.stringify({ active }) });
+}
+
+async function deleteService(id) {
+  if (!confirm('Delete this service?')) return;
+  const res = await apiFetch(`/settings/services/${id}`, { method: 'DELETE' });
+  if (res && res.ok) loadSettings();
+}
+
+function openAddService() { openModal('serviceModal'); }
+
+async function addService() {
+  const name = document.getElementById('svc-name').value.trim();
+  const basePrice = document.getElementById('svc-price').value;
+  if (!name || !basePrice) return alert('Name and price required');
+  const res = await apiFetch('/settings/services', {
+    method: 'POST', body: JSON.stringify({ name, basePrice })
+  });
+  if (res && res.ok) { closeModal('serviceModal'); loadSettings(); }
+}
+
+// ============================================================
+// PROFILE
+// ============================================================
+function loadProfile() {
+  document.getElementById('p-name').value = adminInfo.name || '';
+  document.getElementById('p-username').value = adminInfo.username || '';
+  document.getElementById('p-email').value = adminInfo.email || '';
+  document.getElementById('p-role').value = adminInfo.role || '';
+}
+
+async function changePassword() {
+  const currentPassword = document.getElementById('p-currPass').value;
+  const newPassword = document.getElementById('p-newPass').value;
+  const succEl = document.getElementById('profileSuccess');
+  const errEl = document.getElementById('profileError');
+  succEl.classList.remove('show');
+  errEl.classList.remove('show');
+
+  if (!currentPassword || !newPassword) { errEl.textContent='Both fields required'; errEl.classList.add('show'); return; }
+
+  const res = await apiFetch('/auth/change-password', {
+    method: 'POST', body: JSON.stringify({ currentPassword, newPassword })
+  });
+  const data = await res.json();
+  if (!res.ok) { errEl.textContent = data.error; errEl.classList.add('show'); return; }
+  succEl.classList.add('show');
+  document.getElementById('p-currPass').value = '';
+  document.getElementById('p-newPass').value = '';
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function flashAlert(id) {
+  const el = document.getElementById(id);
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// Initial load
+loadDashboard();
+</script>
+</body>
+</html>
